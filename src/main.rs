@@ -1,15 +1,17 @@
 // mod _1_calorie_elf;
 // mod _2_rock_paper_sissor;
 // mod _3_rucksack_reorg;
-mod _4_camp_cleanup;
+// mod _4_camp_cleanup;
+mod _5_supply_stacks;
 
 // use crate::_1_calorie_elf::*;
 // use crate::_2_rock_paper_sissor::*;
 // use crate::_3_rucksack_reorg::*;
-use crate::_4_camp_cleanup::*;
+// use crate::_4_camp_cleanup::*;
+use crate::_5_supply_stacks::*;
 
 fn main() {
-    let inp = get_inputs();
+    let mut inp = get_inputs();
 
     // # _1_calori_elf
     // 71934 211447(X)
@@ -31,9 +33,14 @@ fn main() {
     // # _4_camp_cleanup
     // 509 870
     // let ans_1 = get_highest_recommendation(inp);
-    let ans_1 = get_overlaps(inp);
+    // let ans_1 = get_overlaps(inp);
+
+    // # _5_supply_stacks
+    // TWSGQHNHL JNRSCDWPP
+    // let ans_1 = rearrange(&mut inp);
+    let ans_1 = rearrange_v2(&mut inp);
 
 
     print!("{ans_1}");
-    //println!(" {ans_2}");
+    // println!(" {ans_2}");
 }
