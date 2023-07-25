@@ -123,6 +123,13 @@ pub fn get_top_three_elfs_with_most_calories(input: &Vec<Vec<i32>>) -> i32 {
             second_highest = first_hightest;
             first_hightest = cals;
         }
+        else if cals >= second_highest {
+            thrid_highest = second_highest;
+            second_highest = cals
+        }
+        else if cals >= thrid_highest {
+            thrid_highest = cals
+        }
     }
 
     first_hightest + second_highest + thrid_highest
