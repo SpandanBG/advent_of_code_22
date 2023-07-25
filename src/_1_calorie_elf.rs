@@ -1,10 +1,8 @@
 use std::fs;
 
 pub fn get_inputs() -> Vec<Vec<i32>> {
-    let file = fs::read("res/_1_calorie_elf.txt")
+    let input = fs::read_to_string("res/_1_calorie_elf.txt")
         .expect("unable to open input file");
-
-    let input = String::from_utf8_lossy(&file);
 
     let input = input.split("\r\n\r\n");
     let input = input.map(|cals| cals.split("\r\n"));
@@ -124,8 +122,6 @@ pub fn get_top_three_elfs_with_most_calories(input: &Vec<Vec<i32>>) -> i32 {
             thrid_highest = second_highest;
             second_highest = first_hightest;
             first_hightest = cals;
-
-            println!("{first_hightest} {second_highest} {thrid_highest}")
         }
     }
 
