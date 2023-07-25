@@ -1,8 +1,10 @@
 // mod _1_calorie_elf;
-mod _2_rock_paper_sissor;
+// mod _2_rock_paper_sissor;
+mod _3_rucksack_reorg;
 
 // use crate::_1_calorie_elf::*;
-use crate::_2_rock_paper_sissor::*;
+// use crate::_2_rock_paper_sissor::*;
+use crate::_3_rucksack_reorg::*;
 
 fn main() {
     let inp = get_inputs();
@@ -15,9 +17,15 @@ fn main() {
 
     // # _2_rock_paper_sissor
     // 9177 12111
-    let ans_1 = score(&inp);
-    let ans_2 = score_v2(&inp);
+    // let ans_1 = score(&inp);
+    // let ans_2 = score_v2(&inp);
     
 
-    println!("{ans_1} {ans_2}")
+    // # _3_rucksack_reorg
+    // 7553
+    let ans_1 = reorg(&inp);
+    let ans_2 = stick_sticker(&inp);
+
+    print!("{ans_1}");
+    println!(" {ans_2}");
 }
