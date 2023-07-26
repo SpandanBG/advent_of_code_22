@@ -120,7 +120,7 @@ impl Buff {
     }
 }
 
-// part 1 sol
+// part 1 & 2 sol
 pub fn find_index(inp: String, size: usize) -> usize {
     let mut i: usize = 0;
     let chars = inp.chars().collect::<Vec<char>>();
