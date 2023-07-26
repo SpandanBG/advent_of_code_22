@@ -41,7 +41,7 @@ fn main() {
     // let ans_1 = rearrange_v2(&mut inp);
 
     // # _6_tuning_trouble
-    // 1723
+    // 1723 3708
     // let ans_1 = find_index(inp, 4);
     let ans_1 = find_index(inp, 14);
 
