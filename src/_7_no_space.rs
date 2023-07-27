@@ -107,7 +107,7 @@
  * sum of the total sizes of those directories?
 */
 use regex::Regex;
-use std::{cell::RefCell, fs, rc::Rc};
+use std::{cell::RefCell, fs, rc::Rc, time};
 
 const ROOT_DIR_NAME: &'static str = "/";
 const PREV_DIR_NAME: &'static str = "..";
@@ -176,7 +176,7 @@ impl Command {
     }
 }
 
-type FilePtr = Rc<RefCell<Box<File>>>;
+type FilePtr = usize;
 
 #[derive(Debug)]
 struct File {
@@ -184,15 +184,17 @@ struct File {
     parent_file: Option<FilePtr>,
     children_files: Option<Vec<FilePtr>>,
     size: i32,
+    location: FilePtr,
 }
 
 impl File {
-    fn new(name: &str, parent_file: Option<FilePtr>, size: i32) -> Box<File> {
+    fn new(name: &str, parent_file: Option<FilePtr>, location: FilePtr, size: i32) -> Box<File> {
         Box::new(File {
             name: String::from(name),
             parent_file,
             children_files: None,
             size,
+            location,
         })
     }
 
@@ -204,15 +206,20 @@ impl File {
         &self.name
     }
 
+    fn update_size(&mut self, size: i32) {
+        self.size += size;
+    }
+
     fn get_size(&self) -> i32 {
-        self.size
+        self.size.clone()
+    }
+
+    fn get_location(&self) -> FilePtr {
+        self.location.clone()
     }
 
     fn get_parent(&self) -> Option<FilePtr> {
-        if self.parent_file.is_none() {
-            return None;
-        }
-        Some(Rc::clone(self.parent_file.as_ref().unwrap()))
+        self.parent_file.clone()
     }
 
     fn get_children(&self) -> Option<&Vec<FilePtr>> {
@@ -222,57 +229,40 @@ impl File {
         self.children_files.as_ref()
     }
 
-    fn get_child(&self, file_name: &String) -> Option<FilePtr> {
-        if self.children_files.is_none() {
-            return None;
-        }
-        for file in self.children_files.as_ref().unwrap().iter() {
-            if file.borrow().get_name().eq(file_name) {
-                return Some(Rc::clone(file));
-            }
-        }
-        return None;
-    }
-
-    fn push_child(&mut self, file: Box<File>) {
+    fn push_child(&mut self, file_location: FilePtr) {
         if self.children_files.is_none() {
             self.children_files = Some(vec![])
         }
-
-        self.update_size(file.size.clone());
-        let file_ptr = Rc::new(RefCell::new(file));
-        self.children_files.as_mut().unwrap().push(file_ptr);
-    }
-
-    fn update_size(&mut self, size: i32) {
-        self.size += size;
-
-        if !self.parent_file.is_none() {
-            self.parent_file
-                .as_mut()
-                .unwrap()
-                .borrow_mut()
-                .update_size(size);
-        }
+        self.children_files.as_mut().unwrap().push(file_location);
     }
 }
 
 #[derive(Debug)]
 struct SSD {
-    root: FilePtr,
     curr_dir: FilePtr,
+    files: Vec<Box<File>>,
 }
 
 impl SSD {
     fn new() -> SSD {
-        let root = File::new("/", None, 0);
-        let root_ptr = Rc::new(RefCell::new(root));
-        let curr_dir = Rc::clone(&root_ptr);
+        let root = File::new("/", None, 0, 0);
+        let files = vec![root];
 
-        SSD {
-            root: root_ptr,
-            curr_dir,
+        SSD { curr_dir: 0, files }
+    }
+
+    fn update_size(&mut self, location: usize, size: i32) {
+        self.files.get_mut(location).unwrap().update_size(size);
+        let parent = self.files.get(location).unwrap().get_parent();
+        if parent.is_none() {
+            return;
         }
+
+        self.update_size(parent.unwrap(), size)
+    }
+
+    fn get_all_files(&self) -> &Vec<Box<File>> {
+        &self.files
     }
 
     fn exec_cd(&mut self, dir_name: &String) {
@@ -291,57 +281,78 @@ impl SSD {
     }
 
     fn exec_ls(&self) {
-        SSD::print_disk(Rc::clone(&self.curr_dir), 1);
+        self.print_disk(self.curr_dir, 1);
     }
 
     fn exec_mkdir(&mut self, dir_name: &String) {
-        let parent = Some(Rc::clone(&self.curr_dir));
-        let new_dir = File::new(dir_name, parent, 0);
-        self.curr_dir.borrow_mut().push_child(new_dir);
+        let new_location = self.files.len();
+        let file = File::new(&dir_name, Some(self.curr_dir), new_location, 0);
+        self.files.push(file);
+        self.files
+            .get_mut(self.curr_dir)
+            .unwrap()
+            .push_child(new_location);
     }
 
     fn exec_touch(&mut self, file_name: &str, size: i32) {
-        let parent = Some(Rc::clone(&self.curr_dir));
-        let new_file = File::new(file_name, parent, size);
-        self.curr_dir.borrow_mut().push_child(new_file);
+        let new_location = self.files.len();
+        let file = File::new(&file_name, Some(self.curr_dir), new_location, size);
+        self.files.push(file);
+        self.update_size(self.curr_dir, size);
+        self.files
+            .get_mut(self.curr_dir)
+            .unwrap()
+            .push_child(new_location);
     }
 
     fn set_curr_dir_to_root(&mut self) {
-        self.curr_dir = Rc::clone(&self.root);
+        self.curr_dir = 0;
     }
 
     fn move_to_prev_dir(&mut self) {
-        let parent = self.curr_dir.borrow().get_parent();
-        if parent.is_none() {
+        let curr_file = self.files.get(self.curr_dir).unwrap();
+        let parent_location = curr_file.get_parent();
+        if parent_location.is_none() {
             return;
         }
-
-        self.curr_dir = Rc::clone(parent.as_ref().unwrap())
+        self.curr_dir = parent_location.unwrap();
     }
 
     fn move_to_child_dir(&mut self, dir_name: &String) {
-        let child = self.curr_dir.borrow().get_child(dir_name);
+        let curr_file = self.files.get(self.curr_dir).unwrap();
+        let children = curr_file.get_children();
+        if children.is_none() {
+            return;
+        }
+
+        let child = children
+            .unwrap()
+            .iter()
+            .map(|file_location| self.files.get(file_location.clone()))
+            .filter(|file| !file.is_none())
+            .map(|file| file.unwrap())
+            .find(|file| file.get_name() == dir_name);
         if child.is_none() {
             return;
         }
-        let child = child.unwrap();
-        self.curr_dir = Rc::clone(&child);
+
+        self.curr_dir = child.unwrap().get_location();
     }
 
-    fn print_disk(file: FilePtr, depth: usize) {
-        let name = file.borrow().get_name().clone();
-        let size = file.borrow().get_size();
+    fn print_disk(&self, file_ptr: FilePtr, depth: usize) {
+        let file = self.files.get(file_ptr).unwrap();
+        let name = file.get_name().clone();
+        let size = file.get_size();
         println!("- {name} {size}");
 
-        let file_ptr = file.borrow();
-        let children = file_ptr.get_children();
+        let children = file.get_children();
         if children.is_none() {
             return;
         }
 
         for child in children.unwrap().iter() {
             print!("{}", "  ".repeat(depth));
-            SSD::print_disk(Rc::clone(&child), depth + 1)
+            self.print_disk(child.clone(), depth + 1)
         }
     }
 }
@@ -359,6 +370,8 @@ pub fn get_inputs() -> Vec<Command> {
 // Part 1 sol
 
 pub fn get_cleanable_space(inp: &Vec<Command>) -> i32 {
+    let start_time = time::Instant::now();
+
     let mut disk = SSD::new();
 
     for cmd in inp.iter() {
@@ -373,28 +386,16 @@ pub fn get_cleanable_space(inp: &Vec<Command>) -> i32 {
     // disk.exec_cd(&String::from(ROOT_DIR_NAME));
     // disk.exec_ls();
 
-    get_required_dirs(Rc::clone(&disk.root))
-        .into_iter()
-        .filter(|size| *size <= 100000)
-        .sum::<i32>()
-}
+    let ans = disk
+        .get_all_files()
+        .iter()
+        .filter(|file| file.is_dir())
+        .filter(|file| file.get_size() <= 100000)
+        .map(|file| file.get_size())
+        .sum::<i32>();
 
-fn get_required_dirs(file: FilePtr) -> Vec<i32> {
-    if !file.borrow().is_dir() {
-        return vec![];
-    }
+    let elapsed = start_time.elapsed().as_micros();
+    println!("Elapsed: {}", elapsed);
 
-    let mut size_list = vec![file.borrow().get_size().clone()];
-
-    let file_ptr = file.borrow();
-    let children = file_ptr.get_children();
-    if children.is_none() {
-        return vec![]; // is a file 
-    }
-
-    for child in children.unwrap().iter() {
-        size_list.extend(get_required_dirs(Rc::clone(&child)));
-    }
-
-    size_list
+    ans
 }

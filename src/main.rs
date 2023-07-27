@@ -48,7 +48,8 @@ fn main() {
     // let ans_1 = find_index(inp, 14);
 
     // # _7_no_space
-    //
+    // Elapsed: 248 
+    // 1325919
     let ans_1 = get_cleanable_space(&inp);
 
     print!("{ans_1}");
