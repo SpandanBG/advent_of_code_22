@@ -3,14 +3,16 @@
 // mod _3_rucksack_reorg;
 // mod _4_camp_cleanup;
 // mod _5_supply_stacks;
-mod _6_tuning_trouble;
+// mod _6_tuning_trouble;
+mod _7_no_space;
 
 // use crate::_1_calorie_elf::*;
 // use crate::_2_rock_paper_sissor::*;
 // use crate::_3_rucksack_reorg::*;
 // use crate::_4_camp_cleanup::*;
 // use crate::_5_supply_stacks::*;
-use crate::_6_tuning_trouble::*;
+// use crate::_6_tuning_trouble::*;
+use crate::_7_no_space::*;
 
 fn main() {
     let inp = get_inputs();
@@ -43,7 +45,11 @@ fn main() {
     // # _6_tuning_trouble
     // 1723 3708
     // let ans_1 = find_index(inp, 4);
-    let ans_1 = find_index(inp, 14);
+    // let ans_1 = find_index(inp, 14);
+
+    // # _7_no_space
+    //
+    let ans_1 = get_cleanable_space(&inp);
 
     print!("{ans_1}");
     // println!(" {ans_2}");
