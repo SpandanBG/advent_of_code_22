@@ -48,10 +48,12 @@ fn main() {
     // let ans_1 = find_index(inp, 14);
 
     // # _7_no_space
-    // Elapsed: 246
+    // Elapsed: 231
     // 1325919
-    let ans_1 = get_cleanable_space(&inp);
+    let ssd = setup_ssd(&inp);
+    let ans_1 = get_cleanable_space(&ssd);
+    let ans_2 = get_cleanable_space_v2(&ssd);
 
     print!("{ans_1}");
-    // println!(" {ans_2}");
+    println!(" {ans_2}");
 }

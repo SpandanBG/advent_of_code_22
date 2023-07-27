@@ -105,12 +105,39 @@
  *
  * Find all of the directories with a total size of at most 100000. What is the
  * sum of the total sizes of those directories?
+ * 
+ * --- Part Two ---
+ * Now, you're ready to choose a directory to delete.
+ * 
+ * The total disk space available to the filesystem is 70000000. To run the 
+ * update, you need unused space of at least 30000000. You need to find a 
+ * directory you can delete that will free up enough space to run the update.
+ * 
+ * In the example above, the total size of the outermost directory (and thus the 
+ * total amount of used space) is 48381165; this means that the size of the 
+ * unused space must currently be 21618835, which isn't quite the 30000000 
+ * required by the update. Therefore, the update still requires a directory with 
+ * total size of at least 8381165 to be deleted before it can run.
+ * 
+ * To achieve this, you have the following options:
+ * 
+ * Delete directory e, which would increase unused space by 584.
+ * Delete directory a, which would increase unused space by 94853.
+ * Delete directory d, which would increase unused space by 24933642.
+ * Delete directory /, which would increase unused space by 48381165.
+ * Directories e and a are both too small; deleting them would not free up 
+ * enough space. However, directories d and / are both big enough! Between 
+ * these, choose the smallest: d, increasing unused space by 24933642.
+ * 
+ * Find the smallest directory that, if deleted, would free up enough space on 
+ * the filesystem to run the update. What is the total size of that directory?
 */
 use regex::Regex;
-use std::{cell::RefCell, fs, rc::Rc, time};
+use std::{time, fs};
 
 const ROOT_DIR_NAME: &'static str = "/";
 const PREV_DIR_NAME: &'static str = "..";
+const MAX_SSD_SPACE: i32 = 70000000;
 
 #[derive(Debug)]
 pub enum Command {
@@ -179,7 +206,7 @@ impl Command {
 type FilePtr = usize;
 
 #[derive(Debug)]
-struct File {
+pub struct File {
     name: String,
     parent_file: Option<FilePtr>,
     children_files: Option<Vec<FilePtr>>,
@@ -238,7 +265,7 @@ impl File {
 }
 
 #[derive(Debug)]
-struct SSD {
+pub struct SSD {
     curr_dir: FilePtr,
     files: Vec<Box<File>>,
 }
@@ -261,6 +288,14 @@ impl SSD {
             }
             return;
         }
+    }
+
+    fn get_used_space(&self) -> i32 {
+        self.files.get(0).unwrap().get_size()
+    }
+
+    fn get_free_space(&self) -> i32 {
+        MAX_SSD_SPACE - self.get_used_space()
     }
 
     fn get_all_files(&self) -> &Vec<Box<File>> {
@@ -369,11 +404,8 @@ pub fn get_inputs() -> Vec<Command> {
         .collect::<Vec<Command>>()
 }
 
-// Part 1 sol
-
-pub fn get_cleanable_space(inp: &Vec<Command>) -> i32 {
+pub fn setup_ssd(inp: &Vec<Command>) -> SSD {
     let start_time = time::Instant::now();
-
     let mut disk = SSD::new();
 
     for cmd in inp.iter() {
@@ -384,20 +416,37 @@ pub fn get_cleanable_space(inp: &Vec<Command>) -> i32 {
             _ => (),
         };
     }
-
     // disk.exec_cd(&String::from(ROOT_DIR_NAME));
+
+    let elapsed = start_time.elapsed().as_micros();
+    println!("Elapsed: {}", elapsed);
+    disk
+}
+
+// Part 1 sol
+pub fn get_cleanable_space(disk: &SSD) -> i32 {
+
     // disk.exec_ls();
 
-    let ans = disk
+    disk
         .get_all_files()
         .iter()
         .filter(|file| file.is_dir())
         .filter(|file| file.get_size() <= 100000)
         .map(|file| file.get_size())
-        .sum::<i32>();
+        .sum::<i32>()
+}
 
-    let elapsed = start_time.elapsed().as_micros();
-    println!("Elapsed: {}", elapsed);
+// Part 2 sol
+pub fn get_cleanable_space_v2(disk: &SSD) -> i32 {
+    let required_total_free_space = 30000000;
+    let requried_free_space = required_total_free_space - disk.get_free_space();
 
-    ans
+    disk
+        .get_all_files()
+        .iter()
+        .filter(|file| file.is_dir())
+        .filter(|file| file.get_size() >= requried_free_space)
+        .map(|file| file.get_size())
+        .fold(i32::MAX, |acc, curr| if curr < acc { curr } else { acc })
 }
