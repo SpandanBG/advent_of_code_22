@@ -252,13 +252,15 @@ impl SSD {
     }
 
     fn update_size(&mut self, location: usize, size: i32) {
-        self.files.get_mut(location).unwrap().update_size(size);
-        let parent = self.files.get(location).unwrap().get_parent();
-        if parent.is_none() {
+        let mut next_location = location;
+        loop {
+            self.files.get_mut(next_location).unwrap().update_size(size);
+            if let Some(parent )= self.files.get(next_location).unwrap().get_parent() {
+                next_location = parent;
+                continue;
+            }
             return;
         }
-
-        self.update_size(parent.unwrap(), size)
     }
 
     fn get_all_files(&self) -> &Vec<Box<File>> {
