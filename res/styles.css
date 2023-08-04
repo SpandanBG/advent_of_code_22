@@ -1,0 +1,286 @@
+/* For Webkit browsers like Chrome and Safari */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE and Edge */
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body {
+    margin-left: 28%;
+    margin-right: 28%;
+    background: #FAFAFA;
+}
+
+body>footer {
+    height: 100px;
+}
+
+body>h2 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 100;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+body>.q_container>h4 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    margin-left: 1rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    padding: .4rem;
+}
+
+body>.q_container {
+    position: relative;
+}
+
+body>.q_container>.q_toggle_btn {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    width: 98%;
+    text-align: end;
+    padding: .4rem;
+    border-radius: .3rem;
+}
+
+body>.q_container>.q_toggle_btn:hover {
+    background: #21212109;
+}
+
+body>.q_container>.title_highlight {
+    border-bottom: 1px solid #BDBDBD;
+}
+
+body>.q_container>.collapse{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+body>.q_container>div>.q_part_wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.3rem;
+}
+
+body>.q_container>div>.q_part_wrapper>.q_solve_btn {
+    margin-top: 3.8px;
+    height: fit-content;
+    border: none;
+    background: #81C784;
+    padding: .2rem;
+    border-radius: .35rem;
+    letter-spacing: .2rem;
+    cursor: pointer;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+body>.q_container>div>.q_part_wrapper>.q_solve_btn:hover {
+    background: #4CAF50;
+}
+
+body>.q_container>div>.q_part_wrapper>.q_part {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 200;
+    font-size: 1.2rem;
+    padding-top: .25rem;
+    margin-top: .5rem;
+    padding-top: 1rem;
+}
+
+body>.q_container>div>.q_part_d_container {
+    padding-left: .5rem;
+    margin-left: .25rem;
+    border-left: 1px solid #BDBDBD;
+}
+
+body>.q_container>div>.q_part_d_container>.code_block {
+    position: relative;
+}
+
+body>.q_container>div>.q_part_d_container>.code_block>.copy_button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    background: none;
+    padding: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+body>.q_container>div>.q_part_d_container>.q_part_d {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: .9rem;
+}
+
+body>.q_container>div>.q_part_d_container>pre {
+    background-color: #F5F5F5;
+    margin-left: 8%;
+    margin-right: 8%;
+    padding: 2%;
+    padding-left: 5%;
+    border-radius: 2%;
+}
+
+body>.q_container>div>.q_part_d_container>pre>code {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: .9rem;
+}
+
+body>.q_container>div>.q_part_d_container>ul>li {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: .9rem;
+    list-style-type: disclosure-closed;
+    padding: .1rem 0;
+}
+
+body>.q_container>div>.q_part_d_container>ul>li:not(:first-child) {
+    padding-top: 0;
+}
+
+body>.q_container>div>.q_part_d_container>ul>li::marker {
+    color: #9E9E9E;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1;
+    background: #212121F8;
+}
+
+.modal>.problem-input {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background: #FAFAFA;
+    padding: 2rem 5rem;
+    border-radius: .4rem;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+.modal>.problem-input>.problem-input-header {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    margin-top: 0rem;
+}
+
+.modal>.problem-input>form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal>.problem-input>form>.input-wrapper {
+    position: relative;
+    height: 30rem;
+}
+
+.modal>.problem-input>form>.input-wrapper>.textarea-input {
+    font-family: 'Roboto', sans-serif;
+    width: 20rem;
+    height: 30rem;
+    resize: none;
+    background: #EEEEEE;
+    border: none;
+    border-radius: .4rem .4rem 0rem 0rem;
+    box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 1px 0px rgba(0, 0, 0, 0.14), inset 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+.modal>.problem-input>form>.input-wrapper>button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: none;
+    background: #81C784;
+    padding: .6rem;
+    margin: .5rem;
+    border-radius: .4rem;
+    cursor: pointer;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+.modal>.problem-input>form>.input-wrapper>button:hover {
+    background: #4CAF50;
+}
+
+.modal>.problem-input>form>.input-wrapper>.textarea-input:focus {
+    outline: none;
+}
+
+.modal>.problem-input>form>.form-submit-btn {
+    font-family: 'Roboto', sans-serif;
+    border: none;
+    background: #81C784;
+    padding: 0.5rem;
+    border-radius: 0rem 0rem .4rem .4rem;
+    box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+}
+
+.modal>.problem-input>form>.form-submit-btn:hover {
+    background: #4CAF50;
+}
+
+.disable-scroll {
+    overflow: hidden;
+}
+
+.no-click {
+    pointer-events: none;
+}
+
+.answer_container {
+    font-family: 'Roboto', sans-serif;
+    margin-left: 1.2rem;
+    padding-left: .8rem;
+    border-left: 1px solid #BDBDBD;
+}
+
+.answer_container>.answer_wrapper {
+    display: flex;
+    gap: .4rem;
+    margin-top: 0.8rem;
+}
+
+.answer_container>.answer_wrapper>.answer {
+    font-weight: 500;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    padding-top: 0.4rem;
+}
+
+.answer_container>.answer_wrapper>button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding-top: 0.4rem;
+}
+
+.answer_container>.performance {
+    font-weight: 100;
+    font-size: .94rem;
+}

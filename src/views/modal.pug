@@ -1,0 +1,12 @@
+script. 
+    document.body.classList.add('disable-scroll')
+
+div(class="modal" id="modal_container")
+    include ./components/input/input
+
+script. 
+    document.getElementById("modal_container")
+        .addEventListener("click", (e) => {
+            document.body.classList.remove('disable-scroll');
+            document.getElementById("modal_container").parentElement.innerHTML = "";
+        });

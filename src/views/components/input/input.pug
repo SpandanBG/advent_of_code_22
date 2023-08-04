@@ -1,0 +1,26 @@
+block form_input
+
+- var day = solve.day 
+- var part = solve.part
+
+div(class="problem-input" id="input_form")
+    h4(class="problem-input-header") #{title} (Part-#{part})
+    form(hx-post="solve/"+day+"/"+part hx-target="ans")
+        div(class="input-wrapper")
+            textarea(class="textarea-input" id="problem-text-input" name="input")
+            button(type="button" onclick="paste_code(event)")
+                i.fa-regular.fa-paste.no-click
+        button(class="form-submit-btn" type="Submit") solve
+    ans
+
+script.
+    function paste_code(event) {
+        window.navigator.clipboard.readText().then(text => {
+            const textarea = document.getElementById("problem-text-input");
+            textarea.value = text;
+        }).catch(err => console.log(err));
+    }
+
+    document.getElementById("input_form").addEventListener("click", (e) => {
+        e.stopPropagation();
+    })

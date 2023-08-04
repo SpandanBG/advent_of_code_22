@@ -1,0 +1,17 @@
+block answer 
+div(class="answer_container")
+    div(class="answer_wrapper")
+        p(class="answer") Answer = #{ans} 
+        button(type="button" onclick="copy_ans()")
+            i.fa-regular.fa-copy.no-click
+    p(class="performance") Solved in #{timeTaken}
+
+script. 
+    function copy_ans() {
+        const textArea = document.createElement('textarea');
+        textArea.value = #{ans};
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+    }

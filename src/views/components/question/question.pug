@@ -1,0 +1,40 @@
+block question
+
+- var q_id = question.id
+- var q_title = question.title
+
+div(class="q_container" id=q_id)
+    button(class="q_toggle_btn") Show
+
+    h4 #{q_title} 
+    div(class="collapse")
+        div(class="q_part_wrapper")
+            p(class="q_part") Part 1
+            button(class="q_solve_btn" hx-get="/solve/"+q_id+"/1?title="+q_title, hx-target="modal") solve 
+        div(class="q_part_d_container")
+            - var part_id = question.id + "_1"
+            - var parts = question.part_1
+            include ./q_part
+
+        div(class="q_part_wrapper")
+            p(class="q_part") Part 2
+            button(class="q_solve_btn" hx-get="/solve/"+q_id+"/2?title="+q_title, hx-target="modal") solve 
+        div(class="q_part_d_container")
+            - var part_id = question.id + "_2"
+            - var parts = question.part_2
+            include ./q_part
+    
+
+    script.
+        const btn_#{q_id} = document.querySelector("##{q_id}>.q_toggle_btn");
+        const q_part_#{q_id} = document.querySelector("##{q_id}>div");
+
+        btn_#{q_id}.addEventListener("click", () => {
+            if (btn_#{q_id}.innerHTML == "Hide") {
+                btn_#{q_id}.innerHTML = "Show";
+                q_part_#{q_id}.classList = ["collapse"];
+            } else {
+                btn_#{q_id}.innerHTML = "Hide";
+                q_part_#{q_id}.classList = [];
+            }
+        });
