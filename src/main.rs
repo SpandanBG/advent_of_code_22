@@ -4,7 +4,8 @@
 // mod _4_camp_cleanup;
 // mod _5_supply_stacks;
 // mod _6_tuning_trouble;
-mod _7_no_space;
+// mod _7_no_space;
+mod _8_treetop_tree_house;
 
 // use crate::_1_calorie_elf::*;
 // use crate::_2_rock_paper_sissor::*;
@@ -12,7 +13,8 @@ mod _7_no_space;
 // use crate::_4_camp_cleanup::*;
 // use crate::_5_supply_stacks::*;
 // use crate::_6_tuning_trouble::*;
-use crate::_7_no_space::*;
+// use crate::_7_no_space::*;
+use crate::_8_treetop_tree_house::*;
 
 fn main() {
     let inp = get_inputs();
@@ -50,10 +52,14 @@ fn main() {
     // # _7_no_space
     // Elapsed: 231
     // 1325919
-    let ssd = setup_ssd(&inp);
-    let ans_1 = get_cleanable_space(&ssd);
-    let ans_2 = get_cleanable_space_v2(&ssd);
+    // let ssd = setup_ssd(&inp);
+    // let ans_1 = get_cleanable_space(&ssd);
+    // let ans_2 = get_cleanable_space_v2(&ssd);
+
+    // # _8_treetop_tree_house
+    //
+    let ans_1 = get_visibility_count(&inp);
 
     print!("{ans_1}");
-    println!(" {ans_2}");
+    // println!(" {ans_2}");
 }
