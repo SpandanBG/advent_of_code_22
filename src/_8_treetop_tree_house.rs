@@ -84,17 +84,13 @@ impl Coord {
     }
 }
 
-#[derive(Debug, Clone)]
-struct CellDistM(i8, i32);
-
 // up:0, left:1, down:2, right:3, it:4
 #[derive(Debug, Clone)] 
-struct HeatCell(CellDistM, CellDistM, CellDistM, CellDistM, i8);
+struct HeatCell(i8, i8, i8, i8, i8);
 
 impl HeatCell {
     fn new(it: i8) -> HeatCell {
-        let cdm = CellDistM(-1, 0);
-        HeatCell(cdm.clone(), cdm.clone(), cdm.clone(), cdm.clone(), it)
+        HeatCell(-1, -1, -1, -1, it)
     }
 }
 
@@ -126,7 +122,7 @@ pub fn get_inputs() -> Quadrent {
 pub fn get_visibility_count(inp: &Quadrent) -> u32 {    
     let mut count = 0;
     for cell in get_heat_map(inp).iter() {
-        if cell.0.0 < cell.4 || cell.1.0 < cell.4 || cell.2.0 < cell.4 || cell.3.0 < cell.4 {
+        if cell.0 < cell.4 || cell.1 < cell.4 || cell.2 < cell.4 || cell.3 < cell.4 {
             count += 1;
         }
     }
@@ -151,36 +147,26 @@ fn get_heat_map(inp: &Quadrent) -> Vec<HeatCell> {
 
         if let Some(up) = center.up() {
             let prev_up = heat_map.get(up.to_index()).unwrap();
-            let higher = if prev_up.0.0 < prev_up.4 {
+            let higher = if prev_up.0 < prev_up.4 {
                 prev_up.4
             } else {
-                prev_up.0.0
+                prev_up.0
             };
-            heat_cell.0.0 = higher;
-            if heat_cell.4 <= prev_up.4 {
-                heat_cell.0.1 = 1;
-            } else {
-                heat_cell.0.1 = prev_up.0.1 + 1
-            }
+            heat_cell.0 = higher;
         } else {
-            heat_cell.0 = CellDistM(-1, 0);
+            heat_cell.0 = -1;
         }
 
         if let Some(left) = center.left() {
             let prev_lf = heat_map.get(left.to_index()).unwrap();
-            let higher = if prev_lf.1.0 < prev_lf.4 {
+            let higher = if prev_lf.1 < prev_lf.4 {
                 prev_lf.4
             } else {
-                prev_lf.1.0
+                prev_lf.1
             };
-            heat_cell.1.0 = higher;
-            if heat_cell.4 <= prev_lf.4 {
-                heat_cell.1.1 = 1;
-            } else {
-                heat_cell.1.1 = prev_lf.1.1 + 1
-            }
+            heat_cell.1 = higher;
         } else {
-            heat_cell.1 = CellDistM(-1, 0);
+            heat_cell.1 = -1;
         }
 
         heat_map[idx] = heat_cell;
@@ -192,35 +178,27 @@ fn get_heat_map(inp: &Quadrent) -> Vec<HeatCell> {
         let center = Coord::new(&idx, inp.width, inp.height);
 
         if let Some(down) = center.down() {
-            let higher = if heat_map[down.to_index()].2.0 < heat_map[down.to_index()].4 {
-                heat_map[down.to_index()].4
+            let prev_dn = heat_map.get(down.to_index()).unwrap();
+            let higher = if prev_dn.2 < prev_dn.4 {
+                prev_dn.4
             } else {
-                heat_map[down.to_index()].2.0
+                prev_dn.2
             };
-            heat_map[idx].2.0 = higher;
-            if heat_map[idx].4 <= heat_map[down.to_index()].4 {
-                heat_map[idx].2.1 = 1;
-            } else {
-                heat_map[idx].2.1 = heat_map[down.to_index()].2.1 + 1;
-            }
+            heat_map[idx].2 = higher;
         } else {
-            heat_map[idx].2 = CellDistM(-1, 0);
+            heat_map[idx].2 = -1;
         }
 
         if let Some(right) = center.right() {
-            let higher = if heat_map[right.to_index()].3.0 < heat_map[right.to_index()].4 {
-                heat_map[right.to_index()].4
+            let prev_rt = heat_map.get(right.to_index()).unwrap();
+            let higher = if prev_rt.3 < prev_rt.4 {
+                prev_rt.4
             } else {
-                heat_map[right.to_index()].3.0
+                prev_rt.3
             };
-            heat_map[idx].3.0 = higher;
-            if heat_map[idx].4 <= heat_map[right.to_index()].4 {
-                heat_map[idx].3.1 = 1;
-            } else {
-                heat_map[idx].3.1 = heat_map[right.to_index()].3.1 + 1;
-            }
+            heat_map[idx].3 = higher;
         } else {
-            heat_map[idx].3 = CellDistM(-1, 0);
+            heat_map[idx].3 = -1;
         }
     }
 
