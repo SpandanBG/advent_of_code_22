@@ -58,8 +58,9 @@ fn main() {
 
     // # _8_treetop_tree_house
     //
-    let ans_1 = get_visibility_count(&inp);
+    // let ans_1 = get_visibility_count(&inp);
+    let ans_2 = get_largest_viewing_scene(&inp);
 
-    print!("{ans_1}");
-    // println!(" {ans_2}");
+    // print!("{ans_1}");
+    println!(" {ans_2}");
 }

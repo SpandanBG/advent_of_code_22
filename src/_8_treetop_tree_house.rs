@@ -8,6 +8,32 @@ pub struct Quadrent {
 }
 
 #[derive(Debug)]
+pub struct ViewMap {
+    width: usize,
+    height: usize,
+    map: Vec<Option<i32>>,
+}
+
+impl ViewMap {
+    fn get(&self, x: usize, y: usize) -> Option<i32> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+
+        let idx = Coord::new_raw(x, y, self.width, self.height).to_index();
+
+        if let Some(value) = self.map.get(idx) {
+            match value {
+                Some(map_value) => Some(*map_value),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
 struct Coord {
     x: usize,
     y: usize,
@@ -25,6 +51,15 @@ impl Coord {
             height,
             width,
         };
+    }
+
+    fn new_raw(x: usize, y: usize, width: usize, height: usize) -> Coord {
+        Coord {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     fn up(&self) -> Option<Self> {
@@ -85,7 +120,7 @@ impl Coord {
 }
 
 // up:0, left:1, down:2, right:3, it:4
-#[derive(Debug, Clone)] 
+#[derive(Debug, Clone)]
 struct HeatCell(i8, i8, i8, i8, i8);
 
 impl HeatCell {
@@ -119,7 +154,7 @@ pub fn get_inputs() -> Quadrent {
 }
 
 // sol 1
-pub fn get_visibility_count(inp: &Quadrent) -> u32 {    
+pub fn get_visibility_count(inp: &Quadrent) -> u32 {
     let mut count = 0;
     for cell in get_heat_map(inp).iter() {
         if cell.0 < cell.4 || cell.1 < cell.4 || cell.2 < cell.4 || cell.3 < cell.4 {
@@ -203,4 +238,110 @@ fn get_heat_map(inp: &Quadrent) -> Vec<HeatCell> {
     }
 
     heat_map
+}
+
+// sol 2
+pub fn get_largest_viewing_scene(inp: &Quadrent) -> u32 {
+    let x_view_map = generate_x_axis_view_map(inp);
+    let y_view_map = generate_y_axis_view_map(inp);
+
+    for (idx, cell) in inp.landscape.iter().enumerate() {
+        let center = Coord::new(&idx, inp.width, inp.height);
+
+        let right = fetch_larger_tree_index(
+            *cell,
+            &x_view_map,
+            &center,
+            (inp.width - 1 - center.x) as i32,
+            |tree_idx, selected_tree_idx| tree_idx > -1 && tree_idx < selected_tree_idx,
+        );
+
+        let left = fetch_larger_tree_index(
+            *cell, 
+            &x_view_map, 
+            &center, 
+            () as i32,
+            | tree_idx, selected_tree_idx| tree_idx < 
+        )
+    }
+
+    0
+}
+
+// fn display_view_map(view_map: &ViewMap) {
+//     for (idx, cell) in view_map.map.iter().enumerate() {
+//         if idx % view_map.width == 0 {
+//             println!()
+//         }
+//         print!("{}:{}\t", idx % view_map.width, if cell.is_none() { -1 } else { cell.unwrap() as i32 });
+//     }
+// }
+
+fn fetch_larger_tree_index(
+    start_tree_size: i8,
+    view_map: &ViewMap,
+    start_coord: &Coord,
+    base_tree_idx: i32,
+    selector_fn: impl Fn(i32, i32) -> bool,
+) -> i32 {
+    (start_tree_size..10).fold(base_tree_idx, |selected_tree_idx, tree_size| {
+        if let Some(tree_index) = view_map.get(tree_size as usize, start_coord.y) {
+            if selector_fn(tree_index, selected_tree_idx) {
+                return tree_index;
+            }
+        }
+        selected_tree_idx
+    })
+}
+
+fn generate_x_axis_view_map(inp: &Quadrent) -> ViewMap {
+    let mut x_view_map = ViewMap {
+        width: 10,
+        height: inp.height,
+        map: vec![None; 10 * inp.height],
+    };
+
+    for (idx, cell) in inp.landscape.iter().enumerate() {
+        if idx % inp.width == 0 {
+            // skip the first index as it will be our starting looking cell
+            continue;
+        }
+
+        let coord = Coord::new(&idx, inp.width, inp.height);
+        let view_map_index = *cell as usize + coord.y * x_view_map.width;
+
+        // We ignore if it has some value, cause from the left,
+        // the repeated value will be furthest
+        if x_view_map.map.get(view_map_index).unwrap().is_none() {
+            x_view_map.map[view_map_index] = Some(idx as i32 % inp.width as i32);
+        }
+    }
+
+    x_view_map
+}
+
+fn generate_y_axis_view_map(inp: &Quadrent) -> ViewMap {
+    let mut y_view_map = ViewMap {
+        width: 10,
+        height: inp.height,
+        map: vec![None; 10 * inp.height],
+    };
+
+    for (idx, cell) in inp.landscape.iter().enumerate() {
+        if idx / inp.height == 0 {
+            // skip the first index as it will be our starting looking cell
+            continue;
+        }
+
+        let coord = Coord::new(&idx, inp.width, inp.height);
+        let view_map_index = *cell as usize + coord.x * y_view_map.width;
+
+        // We ignore if it has some value, cause from the left,
+        // the repeated value will be furthest
+        if y_view_map.map.get(view_map_index).unwrap().is_none() {
+            y_view_map.map[view_map_index] = Some(idx as i32 / inp.height as i32);
+        }
+    }
+
+    y_view_map
 }
